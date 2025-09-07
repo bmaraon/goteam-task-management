@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Repositories\Contracts\{{ name }}RepositoryInterface;
+
+class {{ name }}Repository implements {{ name }}RepositoryInterface
+{
+    // Implement {{ name }} repository methods here
+}
