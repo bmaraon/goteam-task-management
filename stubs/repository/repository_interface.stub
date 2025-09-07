@@ -2,7 +2,11 @@
 
 namespace App\Repositories\Contracts;
 
-interface {{ name }}RepositoryInterface extends BaseRepositoryInterface
+interface {{ name }}RepositoryInterface
 {
-    // Add {{ name }}-specific methods here
+    public function all();
+    public function find($id);
+    public function create(array $data);
+    public function update({{ name }} $model, array $data);
+    public function delete({{ name }} $model);
 }

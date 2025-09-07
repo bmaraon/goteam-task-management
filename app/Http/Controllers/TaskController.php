@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Http\Resources\TaskResource;
 use App\Http\Requests\StoreTaskRequest;
@@ -39,18 +40,14 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $task = $this->repository->create($request->validated());
-
-        return new TaskResource($task);
+        return new TaskResource($this->repository->create($request->validated()));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(int $id): TaskResource
+    public function show(Task $task): TaskResource
     {
-        $task = $this->repository->find($id);
-
         $this->authorize('view', $task);
         
         return new TaskResource($task);
@@ -59,20 +56,18 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTaskRequest $request, int $id)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        return new TaskResource($this->repository->update($id, $request->validated()));
+        return new TaskResource($this->repository->update($task, $request->validated()));
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id)
+    public function destroy(Task $task)
     {
-        $task = $this->repository->find($id);
-
         $this->authorize('delete', $task);
-        $task->delete();
+        $this->repository->delete($task);
 
         return response()->noContent();
     }

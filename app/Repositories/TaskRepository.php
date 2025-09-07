@@ -76,26 +76,26 @@ class TaskRepository implements TaskRepositoryInterface
     /**
      * Update data
      * 
-     * @var int $id
+     * @var Task $model
      * @var array $data
      * 
      * @return Task
      */
-    public function update(int $id, array $data): Task
+    public function update(Task $task, array $data): Task
     {
-        $model = $this->find($id);
-        $model->update($data);
-        return $model;
+        $task->update($data);
+        
+        return $task;
     }
 
     /**
      * Delete data
      * 
-     * @var int $id
+     * @var Task $task
      * @return bool
      */
-    public function delete($id): bool
+    public function delete(Task $task): bool
     {
-        return $this->find($id)->delete();
+        return $task->delete();
     }
 }

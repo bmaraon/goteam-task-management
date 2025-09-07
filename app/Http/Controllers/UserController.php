@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Http\Resources\UserResource;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
@@ -16,10 +17,8 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id): UserResource
+    public function show(User $user): UserResource
     {
-        $user = $this->repository->find($id);
-
         $this->authorize('view', $user);
         
         return new UserResource($user);

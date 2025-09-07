@@ -30,11 +30,6 @@ class MakeRepository extends Command
         }
 
         // Create repository interface
-        $this->makeFromStub(
-            base_path('stubs/repository/base_repository_interface.stub'),
-            app_path('Repositories/Contracts/BaseRepositoryInterface.php')
-        );
-
         $interfaceStubName = $model ? 'repository_interface' : 'empty_repository_interface';
 
         $this->makeFromStub(
@@ -55,14 +50,6 @@ class MakeRepository extends Command
                 '{{ name }}' => $name
             ]
         );
-
-        // Binding reminder
-        $this->info("Create a RepositoryServiceProvider if file does not exists.");
-        $this->info("And, don't forget to register:");
-        $this->line("\$this->app->bind(
-            \\App\\Repositories\\Contracts\\{$name}RepositoryInterface::class,
-            \\App\\Repositories\\{$name}Repository::class
-        );");
     }
 
     protected function makeFromStub($stubPath, $targetPath, array $replacements = [])

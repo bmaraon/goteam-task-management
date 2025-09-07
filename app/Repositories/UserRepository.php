@@ -56,26 +56,26 @@ class UserRepository implements UserRepositoryInterface
     /**
      * Update data
      * 
-     * @var int $id
+     * @var User $user
      * @var array $data
      * 
      * @return User
      */
-    public function update(int $id, array $data): User
+    public function update(User $user, array $data): User
     {
-        $model = $this->find($id);
-        $model->update($data);
-        return $model;
+        $user->update($data);
+        
+        return $user;
     }
 
     /**
      * Delete data
      * 
-     * @var int $id
+     * @var User $user
      * @return bool
      */
-    public function delete($id): bool
+    public function delete(User $user): bool
     {
-        return $this->find($id)->delete();
+        return $user->delete();
     }
 }
