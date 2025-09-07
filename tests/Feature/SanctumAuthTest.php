@@ -32,6 +32,21 @@ class SanctumAuthTest extends TestCase
     }
 
     #[Test]
+    public function it_cannot_login_user()
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('secret123')
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'dummy@email.com',
+            'password' => 'secret123'
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    #[Test]
     public function it_can_login_user()
     {
         $user = User::factory()->create([

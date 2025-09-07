@@ -14,21 +14,21 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $admin = User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name' => 'User one',
+            'email' => 'user.one@example.com',
             'password' => bcrypt('password123')
         ]);
 
-        $this->command->info("Admin user created: admin@example.com / password123");
+        $this->command->info("User one created: user.one@example.com / password123");
         $this->command->info("Token: " . $admin->createToken('admin-token')->plainTextToken);
 
         $admin = User::factory()->create([
-            'name' => 'User one',
-            'email' => 'user1@example.com',
+            'name' => 'User two',
+            'email' => 'user.two@example.com',
             'password' => bcrypt('password123')
         ]);
 
-        $this->command->info("Admin user created: user1@example.com / password123");
+        $this->command->info("User two created: user.two@example.com / password123");
         $this->command->info("Token: " . $admin->createToken('admin-token')->plainTextToken);
     }
 }

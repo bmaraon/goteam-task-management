@@ -40,9 +40,9 @@ class AuthRepository implements AuthRepositoryInterface
      * Find User
      * 
      * @var string $email
-     * @return User
+     * @return User|null
      */
-    public function findByEmail(string $email): User
+    public function findByEmail(string $email): User|null
     {
         return User::where('email', $email)->first();
     }

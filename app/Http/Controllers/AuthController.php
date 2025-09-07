@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\AuthenticateUserRequest;
 use App\Repositories\Contracts\AuthRepositoryInterface;
 
 class AuthController extends Controller
@@ -42,14 +43,15 @@ class AuthController extends Controller
     /**
      * Login User
      * 
-     * @var Request $request
+     * @var AuthenticateUserRequest $request
      * @return Response|JsonResponse
      */
-    public function login(Request $request): Response|JsonResponse
+    public function login(AuthenticateUserRequest $request): Response|JsonResponse
     {
-        $user = $this->repository->findByEmail($request->email);
+        $validated = $request->validated();
+        $user = $this->repository->findByEmail($validated['email']);
 
-        if (!$user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || ! Hash::check($validated['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
