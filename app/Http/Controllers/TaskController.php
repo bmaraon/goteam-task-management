@@ -82,14 +82,13 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $this->authorize('delete', $task);
+        
         try {
             $deletedTask = clone $task;
-            $this->authorize('delete', $task);
             $this->repository->delete($task);
             $this->repository->adjustPriorities($deletedTask);
         } catch (\Exception $e) {
-            dd($e->getMessage());
-
             return response()->json([
                 'message' => 'Internal server error.',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
