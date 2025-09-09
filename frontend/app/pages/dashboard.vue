@@ -82,6 +82,7 @@ const { Trash2 } = lucide as any
 const scheduleStore = useScheduleStore()
 const taskStore = useTaskStore()
 
+const tasksCopy: Ref<Task[]> = ref([])
 const newTask: Ref<string> = ref('')
 const editingPriority: Ref<number> = ref(0)
 const editInput: Ref<HTMLInputElement | null> = ref(null)
@@ -90,8 +91,8 @@ const editTask: Ref<string> = ref('')
 const formattedSelectedDate = computed(() => scheduleStore.formattedSelectedDate)
 const isChangingPriorities = computed(() => taskStore.isChangingPriorities)
 const tasksFilters = computed(() => taskStore.filters)
+const isLoading = computed(() => taskStore.loading)
 const maxPriority = computed(() => taskStore.maxPriority)
-const tasksCopy: Ref<Task[]> = ref([])
 const tasks = computed(() => taskStore.tasks)
 
 onMounted(() => {
@@ -166,17 +167,17 @@ const toggleComplete = (task: Task): void => {
 
 const onOrderChange = async (): Promise<void> => {
     taskStore.setChangingPriorities(true)
-    tasksCopy.value.forEach((item, index) => {
+    tasksCopy.value.map(async (item, index) => {
         const taskInIndex = tasks.value[index];
 
         if (taskInIndex.id !== item.id) {
             item.priority = index + 1
             item.is_completed = item.is_completed ? 1 : 0
-
-            taskStore.updateTask(item)
+            await taskStore.updateTask(item)
         }
     })
 
     taskStore.setChangingPriorities(false)
+    taskStore.setTasks(cloneDeep(tasksCopy.value))
 }
 </script>

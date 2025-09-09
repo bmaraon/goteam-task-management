@@ -42,6 +42,10 @@ export const useTaskStore = defineStore('taskStore', () => {
         }
     }
 
+    const setTasks = (newTasks: Task[] = []) => {
+        tasks.value = [ ...newTasks ]
+    }
+
     const setMaxPriority = (max: number = 0) => {
         maxPriority.value = max
     }
@@ -58,7 +62,6 @@ export const useTaskStore = defineStore('taskStore', () => {
 
         try {
             const response = await $api.get('/api/tasks', { params: { ...filters.value } })
-            console.log('response.data', response.data)
             tasks.value = [ ...response.data.data ]
             maxPriority.value = response.data.meta.max_priority
         } catch (err: any) {
@@ -93,6 +96,7 @@ export const useTaskStore = defineStore('taskStore', () => {
         try {
             const response = await $api.post('/api/tasks', task)
             tasks.value = [ ...tasks.value, response.data.data ]
+            maxPriority.value = maxPriority.value + 1
         } catch (err: any) {
             error.value = err.response?.data?.message || err.message
         } finally {
@@ -108,8 +112,11 @@ export const useTaskStore = defineStore('taskStore', () => {
 
         try {
             const response = await $api.put(`/api/tasks/${task.id}`, task)
-            const index = tasks.value.findIndex(t => t.id === task.id)
-            if (index !== -1) tasks.value[index] = { ...tasks.value[index], ...response.data.data }
+
+            if (!isChangingPriorities) {
+                const index = tasks.value.findIndex(t => t.id === task.id)
+                if (index !== -1) tasks.value[index] = { ...tasks.value[index], ...response.data.data }
+            }
         } catch (err: any) {
             error.value = err.response?.data?.message || err.message
         } finally {
@@ -125,15 +132,7 @@ export const useTaskStore = defineStore('taskStore', () => {
 
         try {
             await $api.delete(`/api/tasks/${task.id}`)
-
-            // update the priorities
-            const newTasks = tasks.value.filter(t => t.id !== task.id)
-
-            newTasks.forEach(async (newTask, newPriority) => {
-                newTask.is_completed = newTask.is_completed ? 1 : 0
-                newTask.priority = newPriority + 1
-                await updateTask(newTask)
-            })
+            await fetchTasks()
         } catch (err: any) {
             error.value = err.response?.data?.message || err.message
         } finally {
@@ -148,6 +147,7 @@ export const useTaskStore = defineStore('taskStore', () => {
         maxPriority,
         setFilters,
         tasks,
+        setTasks,
         loading,
         error,
         filters,

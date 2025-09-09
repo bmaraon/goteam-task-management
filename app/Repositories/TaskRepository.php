@@ -122,4 +122,23 @@ class TaskRepository implements TaskRepositoryInterface
     {
         return $task->delete();
     }
+
+    /**
+     * Adjust Priorities
+     *
+     * @var object|null
+     */
+    public function adjustPriorities(?object $deletedTask = null): void
+    {
+        $newPriority = 1;
+
+        if ($deletedTask) {
+            $this->model->where('user_id', auth()->id())
+                ->whereDate('scheduled_at', $deletedTask->scheduled_at)
+                ->each(function ($task) use (&$newPriority) {
+                    $task->update(['priority' => $newPriority]);
+                    $newPriority++;
+                });
+        }
+    }
 }

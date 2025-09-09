@@ -8,6 +8,7 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TaskController extends Controller
 {
@@ -81,8 +82,18 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $this->authorize('delete', $task);
-        $this->repository->delete($task);
+        try {
+            $deletedTask = clone $task;
+            $this->authorize('delete', $task);
+            $this->repository->delete($task);
+            $this->repository->adjustPriorities($deletedTask);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+
+            return response()->json([
+                'message' => 'Internal server error.',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return response()->noContent();
     }

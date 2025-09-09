@@ -32,7 +32,7 @@
             <div class="w-64" />
 
             <!-- Main content -->
-            <main class="flex-1 p-6 min-h-[calc(100vh-56px)]">
+            <main class="flex-1 p-6 min-h-[calc(100vh-56px)] relative">
                 <slot />
             </main>
         </div>

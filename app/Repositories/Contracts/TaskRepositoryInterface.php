@@ -19,4 +19,6 @@ interface TaskRepositoryInterface
     public function search(array $filters);
 
     public function maxPriority(array $filters = []);
+
+    public function adjustPriorities(?object $deletedTask = null);
 }
