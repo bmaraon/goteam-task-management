@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Task;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class SanctumAuthTest extends TestCase
 {
@@ -19,28 +19,28 @@ class SanctumAuthTest extends TestCase
         $response = $this->postJson('/api/register', [
             'name' => 'Sample User',
             'email' => 'user1@example.com',
-            'password' => 'secret123'
+            'password' => 'secret123',
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'user' => ['id', 'name', 'email'],
-                     'token'
-                 ]);
+            ->assertJsonStructure([
+                'user' => ['id', 'name', 'email'],
+                'token',
+            ]);
 
-        $this->assertDatabaseHas('users', [ 'email' => 'user1@example.com' ]);
+        $this->assertDatabaseHas('users', ['email' => 'user1@example.com']);
     }
 
     #[Test]
     public function it_cannot_login_user()
     {
         $user = User::factory()->create([
-            'password' => Hash::make('secret123')
+            'password' => Hash::make('secret123'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'dummy@email.com',
-            'password' => 'secret123'
+            'password' => 'secret123',
         ]);
 
         $response->assertStatus(401);
@@ -50,16 +50,16 @@ class SanctumAuthTest extends TestCase
     public function it_can_login_user()
     {
         $user = User::factory()->create([
-            'password' => Hash::make('secret123')
+            'password' => Hash::make('secret123'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => $user->email,
-            'password' => 'secret123'
+            'password' => 'secret123',
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['token']);
+            ->assertJsonStructure(['token']);
     }
 
     #[Test]
@@ -75,13 +75,13 @@ class SanctumAuthTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Task::factory()->count(2)->create([ 'user_id' => $user->id ]);
+        Task::factory()->count(2)->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user, 'sanctum')
             ->getJson('/api/tasks');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(2, 'data');
+            ->assertJsonCount(2, 'data');
     }
 
     #[Test]
@@ -91,10 +91,10 @@ class SanctumAuthTest extends TestCase
         $token = $user->createToken('api-token')->plainTextToken;
 
         $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/logout')
-          ->assertStatus(200)
-          ->assertJson(['message' => 'Logged out']);
+            'Authorization' => 'Bearer '.$token,
+        ])->deleteJson('/api/logout')
+            ->assertStatus(200)
+            ->assertJson(['message' => 'Logged out']);
 
         $this->assertCount(0, $user->tokens()->get());
     }

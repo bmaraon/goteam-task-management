@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Repositories\Contracts\AuthRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class AuthRepository implements AuthRepositoryInterface
 {
@@ -12,8 +12,9 @@ class AuthRepository implements AuthRepositoryInterface
 
     /**
      * Class constructor
-     * 
-     * @var Task $model
+     *
+     * @var Task
+     *
      * @return void
      */
     public function __construct(User $model)
@@ -23,13 +24,12 @@ class AuthRepository implements AuthRepositoryInterface
 
     /**
      * Register User
-     * 
-     * @var array $data
-     * @return User
+     *
+     * @var array
      */
     public function create(array $data): User
     {
-        return  User::create([
+        return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -38,11 +38,10 @@ class AuthRepository implements AuthRepositoryInterface
 
     /**
      * Find User
-     * 
-     * @var string $email
-     * @return User|null
+     *
+     * @var string
      */
-    public function findByEmail(string $email): User|null
+    public function findByEmail(string $email): ?User
     {
         return User::where('email', $email)->first();
     }

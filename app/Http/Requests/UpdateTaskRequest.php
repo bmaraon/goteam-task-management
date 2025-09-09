@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Task;
 use App\Enums\TaskStatuses;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,7 +29,7 @@ class UpdateTaskRequest extends FormRequest
             'task' => 'sometimes|required|string|max:255',
             'scheduled_at' => 'required|date',
             'priority' => 'required|numeric|min:1|max:100',
-            'is_completed' => "required|numeric|min:{$toDo}|max:{$completed}"
+            'is_completed' => "required|numeric|min:{$toDo}|max:{$completed}",
         ];
     }
 }

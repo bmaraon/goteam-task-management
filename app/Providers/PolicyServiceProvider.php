@@ -25,7 +25,7 @@ class PolicyServiceProvider extends ServiceProvider
     {
         $policies = [
             Task::class => TaskPolicy::class,
-            User::class => UserPolicy::class
+            User::class => UserPolicy::class,
         ];
 
         foreach ($policies as $model => $policy) {

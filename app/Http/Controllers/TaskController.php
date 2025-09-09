@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use Illuminate\Http\Request;
-use App\Http\Resources\TaskResource;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
+use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     protected TaskRepositoryInterface $repository;
 
-    public function __construct(TaskRepositoryInterface $taskRepository) {
+    public function __construct(TaskRepositoryInterface $taskRepository)
+    {
         $this->repository = $taskRepository;
     }
 
@@ -24,15 +25,29 @@ class TaskController extends Controller
     {
         $filters = [];
 
-        if (request()->has('task')) {
-            $filters['task'] = request()->get('task');
+        if (request()->has('search')) {
+            $filters['task'] = request()->get('search');
         }
 
-        if (!empty($filters)) {
-            return TaskResource::collection($this->repository->search($filters));
+        if (request()->has('date')) {
+            $filters['scheduled_at'] = request()->get('date');
         }
-        
-        return TaskResource::collection($this->repository->all());
+
+        if (! empty($filters)) {
+            return TaskResource::collection($this->repository->search($filters))
+                ->additional([
+                    'meta' => [
+                        'max_priority' => $this->repository->maxPriority($filters),
+                    ],
+                ]);
+        }
+
+        return TaskResource::collection($this->repository->all())
+            ->additional([
+                'meta' => [
+                    'max_priority' => $this->repository->maxPriority(),
+                ],
+            ]);
     }
 
     /**
@@ -49,7 +64,7 @@ class TaskController extends Controller
     public function show(Task $task): TaskResource
     {
         $this->authorize('view', $task);
-        
+
         return new TaskResource($task);
     }
 

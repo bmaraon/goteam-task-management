@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class MakeRepository extends Command
 {
     protected $signature = 'make:repository {name} {--model=} {--table=}';
+
     protected $description = 'Generate repository and interface (optionally tied to a model, policy, resource, and controller) using stubs';
 
     public function handle()
@@ -25,7 +26,7 @@ class MakeRepository extends Command
                 '--migration' => empty($table),
                 '--factory' => true,
                 '--policy' => true,
-                '--resource' => true
+                '--resource' => true,
             ]);
         }
 
@@ -36,7 +37,7 @@ class MakeRepository extends Command
             base_path("stubs/repository/{$interfaceStubName}.stub"),
             app_path("Repositories/Contracts/{$interface}.php"),
             [
-                '{{ name }}' => $name
+                '{{ name }}' => $name,
             ]
         );
 
@@ -47,7 +48,7 @@ class MakeRepository extends Command
             base_path("stubs/repository/{$repositoryStubName}.stub"),
             app_path("Repositories/{$repository}.php"),
             [
-                '{{ name }}' => $name
+                '{{ name }}' => $name,
             ]
         );
     }
@@ -56,6 +57,7 @@ class MakeRepository extends Command
     {
         if (! File::exists($stubPath)) {
             $this->error("Stub not found: {$stubPath}");
+
             return;
         }
 
@@ -67,6 +69,7 @@ class MakeRepository extends Command
         // Prevent overwriting if file already exists
         if (File::exists($targetPath)) {
             $this->warn("Skipped: {$targetPath} already exists.");
+
             return;
         }
 

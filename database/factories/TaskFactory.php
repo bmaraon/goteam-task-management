@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +25,7 @@ class TaskFactory extends Factory
             'task' => fake()->sentence(),
             'priority' => fake()->numberBetween(1, 5),
             'is_completed' => fake()->numberBetween(0, 1),
-            'scheduled_at' => now()->addDays(fake()->numberBetween(1, 30))->toDateString()
+            'scheduled_at' => now()->addDays(fake()->numberBetween(1, 30))->toDateString(),
         ];
     }
 }

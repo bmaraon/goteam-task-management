@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
-Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
+// other web routes, sanctum etc.
+Route::get('/sanctum/csrf-cookie', [\Laravel\Sanctum\Http\Controllers\CsrfCookieController::class, 'show']);
+
+// finally, SPA fallback
+Route::view('/{any}', 'app')->where('any', '.*');

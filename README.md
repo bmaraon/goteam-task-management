@@ -1,11 +1,32 @@
-## Build and run the environment
+## Requirements
+### Backend
+- PHP 8.3.6
+- Composer 2.7.1
+### Frontend
+- NodeJs 24.7.0
+- PNPM 10.15.1
+
+## Environment setup
+1. Create `.env` file, copy the content of `.env.example` and update accordingly.
+2. For the frontend, go to the `frontend` directory and do the following.
 ```
+> touch .env
+
+# create symlink to the main .env
+> ln -s ../.env .env
+```
+2. Build and run the application
+```
+# In the root directory, for the Laravel app
 > ./vendor/bin/sail up
+
+# Go to frontend directory, for the NuxtJs app
+> pnpm install
+> pnpm run dev
 ```
-**Access or call the APIs**
-```
-http://localhost:8080/api/
-```
+3. Access the apps
+- API: http://localhost:8080
+- Web App: http://localhost:3000
 
 ## Create a new module or API endpoint
 ```
@@ -47,8 +68,18 @@ Route::apiResource('samples', SampleController::class);
 > php artisan make:test SampleApiTest // for feature tests
 > php artisan make:test SampleApiTest --unit // for unit tests
 ```
-2. Execute the whole test or specific test.
+10. Execute the whole test or specific test.
 ```
 > php artisan test // test all
 > php artisan test --filter=SampleApiTest
+```
+
+## Linting
+- Backend, in the root directory
+```
+> ./vendor/bin/pint
+```
+- Frontend, got to the `frontend` directory
+```
+> pnpm run lint
 ```

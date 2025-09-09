@@ -2,9 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\TaskRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use App\Models\Task;
+use App\Repositories\Contracts\TaskRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class TaskRepository implements TaskRepositoryInterface
 {
@@ -12,8 +13,9 @@ class TaskRepository implements TaskRepositoryInterface
 
     /**
      * Class constructor
-     * 
-     * @var Task $model
+     *
+     * @var Task
+     *
      * @return void
      */
     public function __construct(Task $model)
@@ -23,37 +25,63 @@ class TaskRepository implements TaskRepositoryInterface
 
     /**
      * All
-     * 
-     * @return Collection
      */
     public function all(): Collection
     {
-        return $this->model->where('user_id', auth()->id())
+        return $this->setMainQuery()
             ->orderBy('priority') // always arrange by priority
             ->get();
     }
 
     /**
      * Search data
-     * 
-     * @var array $filters
-     * @return Collection
+     *
+     * @var array
      */
     public function search(array $filters): Collection
     {
-        return $this->model->where('user_id', auth()->id())
-            ->when(!empty($filters['task']), function ($query) use ($filters) {
-                $query->where('task', 'like', "%{$filters['task']}%");
-            })
+        return $this->setMainQuery($filters)
             ->orderBy('priority') // always arrange by priority
             ->get();
     }
 
     /**
+     * Max priority
+     *
+     * @var array
+     */
+    public function maxPriority(array $filters = []): int
+    {
+        unset($filters['search']); // this will mess up the getting of max priority
+
+        return $this->setMainQuery()->max('priority') ?? 0;
+    }
+
+    /**
+     * Set Main Query
+     *
+     * @var array
+     */
+    private function setMainQuery(array $filters = []): Builder
+    {
+        return $this->model->where('user_id', auth()->id())
+            ->when(! empty($filters), function ($query) use ($filters) {
+                foreach ($filters as $key => $value) {
+                    if ($key === 'scheduled_at') {
+                        $query->whereDate($key, $value);
+                    }
+
+                    if ($key === 'task') {
+                        $query->where($key, 'like', "%{$value}%");
+                    }
+                }
+            });
+    }
+
+    /**
      * Find data
-     * 
-     * @var @int $id
-     * @return Task
+     *
+     * @var @int
      */
     public function find(int $id): Task
     {
@@ -62,37 +90,33 @@ class TaskRepository implements TaskRepositoryInterface
 
     /**
      * Create data
-     * 
-     * @var array $data
-     * @return Task
+     *
+     * @var array
      */
     public function create(array $data): Task
     {
         $data['user_id'] = auth()->id();
-        
+
         return $this->model->create($data);
     }
 
     /**
      * Update data
-     * 
-     * @var Task $model
-     * @var array $data
-     * 
-     * @return Task
+     *
+     * @var Task
+     * @var array
      */
     public function update(Task $task, array $data): Task
     {
         $task->update($data);
-        
+
         return $task;
     }
 
     /**
      * Delete data
-     * 
-     * @var Task $task
-     * @return bool
+     *
+     * @var Task
      */
     public function delete(Task $task): bool
     {

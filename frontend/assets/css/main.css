@@ -1,0 +1,9 @@
+/* frontend/assets/css/main.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can also add your own global styles */
+body {
+    font-family: sans-serif;
+}

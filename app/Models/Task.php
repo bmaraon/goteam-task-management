@@ -10,7 +10,6 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
-    
     /**
      * The attributes that are mass assignable.
      *
@@ -21,7 +20,7 @@ class Task extends Model
         'user_id',
         'priority',
         'is_completed',
-        'scheduled_at'
+        'scheduled_at',
     ];
 
     /**

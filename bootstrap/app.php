@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\HandleCors;
 use App\Providers\AppServiceProvider;
 use App\Providers\PolicyServiceProvider;
 use App\Providers\RepositoryServiceProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,20 +15,22 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        // Register Sanctum for API routes
-        $middleware->group('api', [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->group('web', [
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            EnsureFrontendRequestsAreStateful::class,
         ]);
 
-        // Global CORS
-        $middleware->append(HandleCors::class);
+        $middleware->group('api', [
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
     })
     ->withProviders([
         AppServiceProvider::class,
         PolicyServiceProvider::class,
-        RepositoryServiceProvider::class
+        RepositoryServiceProvider::class,
     ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //

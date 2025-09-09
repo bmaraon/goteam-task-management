@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Models\User;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class UserApiTest extends TestCase
 {
@@ -32,6 +32,6 @@ class UserApiTest extends TestCase
             ->getJson("/api/users/{$user->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([ 'id' => $user->id ]);
+            ->assertJsonFragment(['id' => $user->id]);
     }
 }

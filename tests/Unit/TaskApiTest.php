@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class TaskApiTest extends TestCase
 {
@@ -25,18 +25,20 @@ class TaskApiTest extends TestCase
     public function it_can_list_tasks()
     {
         $user = User::factory()->create();
-        Task::factory()->count(3)->create([ 'user_id' => $user->id ]);
+        Task::factory()->count(3)->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user, 'sanctum')
             ->getJson('/api/tasks');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     #[Test]
     public function it_can_list_tasks_by_filter()
     {
+        $today = Carbon::today()->toDateString();
+        $yesterday = Carbon::yesterday()->toDateString();
         $user = User::factory()->create();
         $user2 = User::factory()->create();
         $maxTaskCount = 3;
@@ -45,7 +47,17 @@ class TaskApiTest extends TestCase
             Task::factory()->create([
                 'user_id' => $user->id,
                 'priority' => $i,
-                'task' => "User 1 task {$i}"
+                'task' => "User 1 task {$i}",
+                'scheduled_at' => $today,
+            ]);
+        }
+
+        for ($i = 1; $i <= $maxTaskCount; $i++) {
+            Task::factory()->create([
+                'user_id' => $user->id,
+                'priority' => $i,
+                'task' => "User 1 task {$i}",
+                'scheduled_at' => $yesterday,
             ]);
         }
 
@@ -53,23 +65,44 @@ class TaskApiTest extends TestCase
             Task::factory()->create([
                 'user_id' => $user2->id,
                 'priority' => $i,
-                'task' => "User 2 task {$i}"
+                'task' => "User 2 task {$i}",
+                'scheduled_at' => $today,
             ]);
         }
 
-        $filters = http_build_query([ 'task' => 'User 1' ]);
+        $filters = http_build_query(['search' => 'User 1']);
         $response = $this->actingAs($user, 'sanctum')
             ->getJson("/api/tasks?{$filters}");
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(6, 'data');
 
-        $filters = http_build_query([ 'task' => 'User 2' ]);
+        $filters = http_build_query([
+            'search' => 'User 1',
+            'date' => $today,
+        ]);
         $response = $this->actingAs($user, 'sanctum')
             ->getJson("/api/tasks?{$filters}");
 
         $response->assertStatus(200)
-                 ->assertJsonCount(0, 'data');
+            ->assertJsonCount(3, 'data');
+
+        $filters = http_build_query([
+            'search' => 'User 1',
+            'date' => $yesterday,
+        ]);
+        $response = $this->actingAs($user, 'sanctum')
+            ->getJson("/api/tasks?{$filters}");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data');
+
+        $filters = http_build_query(['search' => 'User 2']);
+        $response = $this->actingAs($user, 'sanctum')
+            ->getJson("/api/tasks?{$filters}");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(0, 'data');
     }
 
     #[Test]
@@ -82,7 +115,7 @@ class TaskApiTest extends TestCase
         for ($i = 1; $i <= $maxTaskCount; $i++) {
             Task::factory()->create([
                 'user_id' => $user->id,
-                'priority' => $taskCount
+                'priority' => $taskCount,
             ]);
 
             $taskCount--;
@@ -90,11 +123,11 @@ class TaskApiTest extends TestCase
 
         $response = $this->actingAs($user, 'sanctum')
             ->getJson('/api/tasks');
-            
+
         $responseData = json_decode($response->getContent())->data;
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
 
         $this->assertTrue($responseData[0]->priority === 1);
         $this->assertTrue($responseData[1]->priority === 2);
@@ -110,14 +143,14 @@ class TaskApiTest extends TestCase
             'task' => 'New Task',
             'priority' => 1,
             'is_completed' => 0,
-            'scheduled_at' => Carbon::parse(now())->toDateString()
+            'scheduled_at' => Carbon::parse(now())->toDateString(),
         ];
 
         $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/tasks', $payload);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment(['task' => 'New Task']);
+            ->assertJsonFragment(['task' => 'New Task']);
 
         $this->assertDatabaseHas('tasks', $payload);
     }
@@ -138,28 +171,28 @@ class TaskApiTest extends TestCase
     public function it_can_show_a_task()
     {
         $user = User::factory()->create();
-        $task = Task::factory()->create([ 'user_id' => $user->id ]);
+        $task = Task::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user, 'sanctum')
             ->getJson("/api/tasks/{$task->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([ 'id' => $task->id ]);
+            ->assertJsonFragment(['id' => $task->id]);
     }
 
     #[Test]
     public function it_cannot_update_a_task()
     {
         $user = User::factory()->create();
-        $task = Task::factory()->create([ 'task' => 'New Task' ]);
+        $task = Task::factory()->create(['task' => 'New Task']);
 
         $response = $this->actingAs($user, 'sanctum')
             ->putJson("/api/tasks/{$task->id}", []);
 
         $response->assertStatus(403);
-        $this->assertDatabaseHas('tasks',  [
+        $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
-            'task' => 'New Task'
+            'task' => 'New Task',
         ]);
     }
 
@@ -172,27 +205,27 @@ class TaskApiTest extends TestCase
             'task' => 'New Task',
             'priority' => 1,
             'is_completed' => 0,
-            'scheduled_at' => Carbon::parse(now())->toDateString()
+            'scheduled_at' => Carbon::parse(now())->toDateString(),
         ]);
-        
+
         $payload = [
             'task' => 'Update Task',
             'priority' => 2,
             'is_completed' => 1,
-            'scheduled_at' => Carbon::parse(now())->toDateString()
+            'scheduled_at' => Carbon::parse(now())->toDateString(),
         ];
 
         $response = $this->actingAs($user, 'sanctum')
             ->putJson("/api/tasks/{$task->id}", $payload);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                    'task' => 'Update Task'
-                 ]);
+            ->assertJsonFragment([
+                'task' => 'Update Task',
+            ]);
 
-        $this->assertDatabaseHas('tasks',  [
+        $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
-            'task' => 'Update Task'
+            'task' => 'Update Task',
         ]);
     }
 
@@ -206,14 +239,14 @@ class TaskApiTest extends TestCase
             ->deleteJson("/api/tasks/{$task->id}");
 
         $response->assertStatus(403);
-        $this->assertDatabaseHas('tasks', [ 'id' => $task->id ]);
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
     }
 
     #[Test]
     public function it_can_delete_a_task()
     {
         $user = User::factory()->create();
-        $task = Task::factory()->create([ 'user_id' => $user->id ]);
+        $task = Task::factory()->create(['user_id' => $user->id]);
 
         $response = $this->actingAs($user, 'sanctum')
             ->deleteJson("/api/tasks/{$task->id}");

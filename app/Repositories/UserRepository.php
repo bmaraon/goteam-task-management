@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\User;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -12,8 +12,9 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * Class constructor
-     * 
-     * @var User $model
+     *
+     * @var User
+     *
      * @return void
      */
     public function __construct(User $model)
@@ -23,8 +24,6 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * All
-     * 
-     * @return Collection
      */
     public function all(): Collection
     {
@@ -33,9 +32,8 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * Find data
-     * 
-     * @var @int $id
-     * @return User
+     *
+     * @var @int
      */
     public function find(int $id): User
     {
@@ -44,9 +42,8 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * Create data
-     * 
-     * @var array $data
-     * @return User
+     *
+     * @var array
      */
     public function create(array $data): User
     {
@@ -55,24 +52,21 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * Update data
-     * 
-     * @var User $user
-     * @var array $data
-     * 
-     * @return User
+     *
+     * @var User
+     * @var array
      */
     public function update(User $user, array $data): User
     {
         $user->update($data);
-        
+
         return $user;
     }
 
     /**
      * Delete data
-     * 
-     * @var User $user
-     * @return bool
+     *
+     * @var User
      */
     public function delete(User $user): bool
     {
