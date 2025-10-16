@@ -83,7 +83,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $this->authorize('delete', $task);
-        
+
         try {
             $deletedTask = clone $task;
             $this->repository->delete($task);

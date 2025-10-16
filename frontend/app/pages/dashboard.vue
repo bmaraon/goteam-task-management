@@ -1,71 +1,69 @@
 <template>
-    <DefaultLayout>
-        <section class="max-w-3xl mx-auto bg-transparent rounded-lg p-4 relative flex flex-col h-full">
+    <section class="max-w-3xl mx-auto bg-transparent rounded-lg p-4 relative flex flex-col h-full">
+        <!-- When tasks empty: show textarea on top -->
+        <div v-if="tasks.length === 0" class="flex-1 flex flex-col">
+            <label class="block text-sm text-slate-600 mb-2">What's on your mind?</label>
+            <textarea v-model="newTask" rows="2" placeholder="Add a new task..."
+                class="w-full rounded-md border border-slate-200 p-2 resize-none focus:outline-none focus:ring-2 focus:ring-slate-200"
+                @keydown.enter.prevent="addTask"></textarea>
+        </div>
 
-            <!-- When tasks empty: show textarea on top -->
-            <div v-if="tasks.length === 0" class="flex-1 flex flex-col">
+        <!-- When tasks exist: list + pinned input -->
+        <div v-else class="flex-1 flex flex-col">
+
+            <!-- Scrollable task list -->
+            <div class="flex-1 overflow-auto pr-1">
+                <draggable :list="tasksCopy" @change="onOrderChange" item-key="priority"
+                    :disabled="tasksFilters?.search !== ''">
+                    <template #item="{ element: item, index }">
+                        <div class="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm outline outline-1 outline-slate-100 mb-3 last:mb-0 transition-all duration-200"
+                            :class="{ 'opacity-60 line-through': item.is_completed }">
+                            <!-- Checkbox -->
+                            <div class="flex-shrink-0">
+                                <input class="cursor-pointer" type="checkbox" :checked="item.is_completed"
+                                    :disabled="editingPriority === item.priority" @change="toggleComplete(item)" />
+                            </div>
+
+                            <!-- Task details / edit -->
+                            <div class="flex-1">
+                                <div v-if="editingPriority !== item.priority"
+                                    @dblclick="!item.is_completed ? enterEditTask(item) : null" class="cursor-text">
+                                    <div class="font-medium">{{ item.task }}</div>
+                                </div>
+
+                                <div v-else>
+                                    <input ref="editInput" v-model="editTask" @keydown.esc="cancelEdit()"
+                                        @keydown.enter="submitEdit(item)"
+                                        class="w-full rounded-md border border-slate-200 p-2 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+                                </div>
+                            </div>
+
+                            <!-- Trash icon -->
+                            <div class="flex-shrink-0">
+                                <button @click="removeTask(item)" title="Delete">
+                                    <Trash2 :size="18" />
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </draggable>
+            </div>
+
+            <!-- Pinned input at bottom -->
+            <div class="mt-3 border-t pt-3 flex flex-col">
                 <label class="block text-sm text-slate-600 mb-2">What's on your mind?</label>
                 <textarea v-model="newTask" rows="2" placeholder="Add a new task..."
                     class="w-full rounded-md border border-slate-200 p-2 resize-none focus:outline-none focus:ring-2 focus:ring-slate-200"
                     @keydown.enter.prevent="addTask"></textarea>
             </div>
-
-            <!-- When tasks exist: list + pinned input -->
-            <div v-else class="flex-1 flex flex-col">
-
-                <!-- Scrollable task list -->
-                <div class="flex-1 overflow-auto pr-1">
-                    <draggable :list="tasksCopy" @change="onOrderChange" item-key="priority"
-                        :disabled="tasksFilters?.search !== ''">
-                        <template #item="{ element: item, index }">
-                            <div class="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm outline outline-1 outline-slate-100 mb-3 last:mb-0 transition-all duration-200"
-                                :class="{ 'opacity-60 line-through': item.is_completed }">
-                                <!-- Checkbox -->
-                                <div class="flex-shrink-0">
-                                    <input class="cursor-pointer" type="checkbox" :checked="item.is_completed"
-                                        :disabled="editingPriority === item.priority" @change="toggleComplete(item)" />
-                                </div>
-
-                                <!-- Task details / edit -->
-                                <div class="flex-1">
-                                    <div v-if="editingPriority !== item.priority"
-                                        @dblclick="!item.is_completed ? enterEditTask(item) : null" class="cursor-text">
-                                        <div class="font-medium">{{ item.task }}</div>
-                                    </div>
-
-                                    <div v-else>
-                                        <input ref="editInput" v-model="editTask" @keydown.esc="cancelEdit()"
-                                            @keydown.enter="submitEdit(item)"
-                                            class="w-full rounded-md border border-slate-200 p-2 focus:outline-none focus:ring-2 focus:ring-slate-300" />
-                                    </div>
-                                </div>
-
-                                <!-- Trash icon -->
-                                <div class="flex-shrink-0">
-                                    <button @click="removeTask(item)" title="Delete">
-                                        <Trash2 :size="18" />
-                                    </button>
-                                </div>
-                            </div>
-                        </template>
-                    </draggable>
-                </div>
-
-                <!-- Pinned input at bottom -->
-                <div class="mt-3 border-t pt-3 flex flex-col">
-                    <label class="block text-sm text-slate-600 mb-2">What's on your mind?</label>
-                    <textarea v-model="newTask" rows="2" placeholder="Add a new task..."
-                        class="w-full rounded-md border border-slate-200 p-2 resize-none focus:outline-none focus:ring-2 focus:ring-slate-200"
-                        @keydown.enter.prevent="addTask"></textarea>
-                </div>
-            </div>
-        </section>
-    </DefaultLayout>
+        </div>
+    </section>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-    middleware: 'auth'
+    middleware: 'auth',
+    name: 'dashboard'
 })
 
 import { Ref, ref, onMounted, computed, watch, nextTick } from 'vue'
@@ -73,7 +71,6 @@ import { useTaskStore, Task } from '../stores/task'
 import { useScheduleStore } from '../stores/schedule'
 import { cloneDeep } from 'lodash'
 
-import DefaultLayout from '../layouts/default.vue'
 import Draggable from 'vuedraggable'
 import * as lucide from 'lucide-vue-next'
 
@@ -91,12 +88,11 @@ const editTask: Ref<string> = ref('')
 const formattedSelectedDate = computed(() => scheduleStore.formattedSelectedDate)
 const isChangingPriorities = computed(() => taskStore.isChangingPriorities)
 const tasksFilters = computed(() => taskStore.filters)
-const isLoading = computed(() => taskStore.loading)
 const maxPriority = computed(() => taskStore.maxPriority)
 const tasks = computed(() => taskStore.tasks)
 
 onMounted(() => {
-    scheduleStore.setSelectedDate(new Date(tasksFilters.value.date))
+    scheduleStore.setSelectedDate(new Date(tasksFilters?.value.date))
 })
 
 watch(formattedSelectedDate, (newDate, oldDate) => {

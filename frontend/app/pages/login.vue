@@ -1,6 +1,5 @@
 <template>
     <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 space-y-6">
-
         <!-- Company Logo at the top -->
         <div class="flex justify-center">
             <img src="/logo.jpg" alt="Company Logo" class="h-20 w-auto">
@@ -61,6 +60,7 @@
 <script setup lang="ts">
 definePageMeta({
     middleware: 'auth',
+    name: 'login',
     layout: false
 })
 

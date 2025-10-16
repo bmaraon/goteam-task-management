@@ -3,8 +3,7 @@ definePageMeta({
     layout: false
 })
 
-import { navigateTo } from '#app'
+import { navigateTo } from 'nuxt/app'
 
-// Redirect "/" to "/login"
-navigateTo('/login')
+navigateTo({ name: 'login' })
 </script>

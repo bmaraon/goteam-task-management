@@ -6,23 +6,17 @@
 
 <script setup lang="ts">
 definePageMeta({
+    name: 'logout',
+    middleware: 'auth',
     layout: false
 })
 
 import { onMounted } from "vue"
-import { useRouter } from "vue-router"
-import { useAuthStore } from "../stores/auth"
+import { useLogoutUser } from "../composables/useLogoutUser"
 
-const authStore = useAuthStore()
-const router = useRouter()
+const { logout } = useLogoutUser()
 
 onMounted(async () => {
-    try {
-        await authStore.logout()
-        router.push({ name: "login" })
-    } catch (error) {
-        console.error("Logout failed:", error)
-        router.push({ name: "login" })
-    }
+    await logout()
 })
 </script>

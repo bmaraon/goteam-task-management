@@ -2,6 +2,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { fileURLToPath } from 'url'
 
 export default defineNuxtConfig({
+  ssr: false,
   css: ['@/assets/css/main.css'],
   devServer: {
     port: 3000

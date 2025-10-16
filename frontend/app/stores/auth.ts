@@ -22,9 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   // State
   // -------------------
   const user: Ref<User | null> = ref(null)
-  const token: Ref<string | null> = ref(
-    typeof window !== 'undefined' ? localStorage.getItem('token') : null
-  )
+  const token: Ref<string | null> = ref(null)
 
   // -------------------
   // Actions
@@ -76,6 +74,13 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('filters')
       }
     }
+  }
+
+  // -------------------
+  // Initialize token from localStorage on client
+  // -------------------
+  if (process.client) {
+    token.value = localStorage.getItem('token')
   }
 
   // -------------------

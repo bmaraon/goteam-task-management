@@ -17,8 +17,8 @@
 
                 <!-- Greeting -->
                 <div class="ml-auto">
-                    <span class="text-sm"><strong>Hello, {{ user?.name }}!</strong></span> | <a
-                        class="text-sm no-underline text-gray" href="#" @click="logout">Logout</a>
+                    <span class="text-sm"><strong>Hello, {{ user?.name }}!</strong></span> | <button
+                        class="text-sm no-underline text-gray" @click="logout">Logout</button>
                 </div>
             </div>
         </header>
@@ -44,13 +44,13 @@ import { Ref, ref, onMounted, computed, watch, nextTick } from 'vue'
 import { useRouter, NavigationFailure } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useTaskStore } from '../stores/task'
+import { useLogoutUser } from '../composables/useLogoutUser'
 
 import Sidebar from '../components/Sidebar.vue'
 
 const taskStore = useTaskStore()
 const authStore = useAuthStore()
-const router = useRouter()
-
+const { logout } = useLogoutUser()
 const user = computed(() => authStore.user)
 const taskFilters = computed(() => taskStore.filters)
 
@@ -59,14 +59,4 @@ const search: Ref<string> = ref(taskFilters.value?.search)
 watch(search, newSearch => {
     taskStore.setFilters({ search: newSearch })
 })
-
-const logout = async (): Promise<NavigationFailure | void> => {
-    try {
-        await authStore.logout()
-        return router.push({ name: "login" })
-    } catch (error) {
-        console.error("Logout failed:", error)
-        return router.push({ name: "login" })
-    }
-}
 </script>
