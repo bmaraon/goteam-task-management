@@ -58,22 +58,19 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const resetStates = (): void => {
+    user.value = null
+    token.value = null
+    
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('filters')
+    }
+  }
+
   const logout = async (): Promise<void> => {
     const { $api } = useNuxtApp()
-
-    try {
-      await $api.delete('/api/logout')
-    } catch (error) {
-      console.error('Logging out user failed:', error)
-    } finally {
-      user.value = null
-      token.value = null
-      
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token')
-        localStorage.removeItem('filters')
-      }
-    }
+    return await $api.delete('/api/logout', { withCredentials: true })
   }
 
   // -------------------
@@ -86,5 +83,5 @@ export const useAuthStore = defineStore('auth', () => {
   // -------------------
   // Return store
   // -------------------
-  return { user, token, login, fetchUser, logout }
+  return { user, token, login, fetchUser, resetStates, logout }
 })

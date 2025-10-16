@@ -84,6 +84,7 @@ const newTask: Ref<string> = ref('')
 const editingPriority: Ref<number> = ref(0)
 const editInput: Ref<HTMLInputElement | null> = ref(null)
 const editTask: Ref<string> = ref('')
+const mounted: Ref<boolean> = ref(false)
 
 const formattedSelectedDate = computed(() => scheduleStore.formattedSelectedDate)
 const isChangingPriorities = computed(() => taskStore.isChangingPriorities)
@@ -92,17 +93,21 @@ const maxPriority = computed(() => taskStore.maxPriority)
 const tasks = computed(() => taskStore.tasks)
 
 onMounted(() => {
-    scheduleStore.setSelectedDate(new Date(tasksFilters?.value.date))
+    const selectedDate = tasksFilters?.value.date ? new Date(tasksFilters?.value.date) : 'today'
+    scheduleStore.setSelectedDate(selectedDate)
+    taskStore.setFilters({ date: scheduleStore.formatDate(selectedDate) })
+    taskStore.fetchTasks()
+    mounted.value = true
 })
 
 watch(formattedSelectedDate, (newDate, oldDate) => {
-    if (oldDate !== newDate) {
+    if (mounted.value && oldDate !== newDate) {
         taskStore.setFilters({ date: newDate })
     }
 })
 
 watch(tasksFilters, async (newFilters, oldFilters) => {
-    if (oldFilters !== newFilters) {
+    if (mounted.value && oldFilters !== newFilters) {
         taskStore.fetchTasks()
     }
 })

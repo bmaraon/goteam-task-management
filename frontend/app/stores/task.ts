@@ -34,6 +34,14 @@ export const useTaskStore = defineStore('taskStore', () => {
     // -------------------
     // Actions
     // -------------------
+    const resetStates = (): void => {
+        filters.value = defaultFilterValues.value
+        tasks.value = []
+        maxPriority.value = 0
+        isChangingPriorities.value = false
+        error.value = null
+    }
+
     const setFilters = (filter: object = {}) => {
         filters.value = { ...filters.value, ...filter }
 
@@ -157,6 +165,7 @@ export const useTaskStore = defineStore('taskStore', () => {
         updateTask,
         deleteTask,
         setChangingPriorities,
-        isChangingPriorities
+        isChangingPriorities,
+        resetStates
     }
 })

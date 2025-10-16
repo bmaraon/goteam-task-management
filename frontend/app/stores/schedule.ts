@@ -11,6 +11,11 @@ export const useScheduleStore = defineStore('schedule', () => {
     // -------------------
     // Actions
     // -------------------
+    const resetStates = (): void => {
+        selectedDate.value = ''
+        formattedSelectedDate.value = ''
+    }
+    
     const setSelectedDate = (date: 'today' | 'yesterday' | Date): void => {
         selectedDate.value = date
         formattedSelectedDate.value = formatDate(date)
@@ -44,5 +49,6 @@ export const useScheduleStore = defineStore('schedule', () => {
         formatDate,
         formattedSelectedDate,
         setSelectedDate,
+        resetStates
     }
 })
