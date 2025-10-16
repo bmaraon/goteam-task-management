@@ -3,6 +3,9 @@ import { fileURLToPath } from 'url'
 
 export default defineNuxtConfig({
   css: ['@/assets/css/main.css'],
+  devServer: {
+    port: 3000
+  },
   vite: {
     plugins: [
       tsconfigPaths()
@@ -23,18 +26,12 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080',
     },
   },
   nitro: {
     output: {
-      dir: '../public/_nuxt', // build into Laravel’s public dir
+      dir: '../public/_nuxt', // build into Laravel's public dir
     }
-  },
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
   }
 })

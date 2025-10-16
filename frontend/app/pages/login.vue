@@ -60,7 +60,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-    middleware: 'auth'
+    middleware: 'auth',
+    layout: false
 })
 
 import { ref } from 'vue'

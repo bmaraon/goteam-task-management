@@ -16,7 +16,7 @@
                 <!-- Scrollable task list -->
                 <div class="flex-1 overflow-auto pr-1">
                     <draggable :list="tasksCopy" @change="onOrderChange" item-key="priority"
-                        :disabled="tasksFilters.search !== ''">
+                        :disabled="tasksFilters?.search !== ''">
                         <template #item="{ element: item, index }">
                             <div class="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm outline outline-1 outline-slate-100 mb-3 last:mb-0 transition-all duration-200"
                                 :class="{ 'opacity-60 line-through': item.is_completed }">

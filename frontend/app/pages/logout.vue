@@ -5,6 +5,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+    layout: false
+})
+
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { useAuthStore } from "../stores/auth"
