@@ -40,8 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, onMounted, computed, watch, nextTick } from 'vue'
-import { useRouter, NavigationFailure } from 'vue-router'
+import { Ref, ref, computed, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useTaskStore } from '../stores/task'
 import { useLogoutUser } from '../composables/useLogoutUser'
